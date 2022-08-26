@@ -3,7 +3,7 @@
 from tkinter import *
 import random
 
-#Enter game UI test
+#Enter game UI
 
 window = Tk()
 window.title("Osu!")
