@@ -1,4 +1,4 @@
-#Todo: combo bonus, various map, highest score
+#Todo: combo bonus, various map, highest score, personal record
 
 from tkinter import *
 import random
@@ -7,6 +7,7 @@ import random
 
 window = Tk()
 window.title("Osu!")
+window.config(cursor= 'none')
 
 canvas = Canvas(window, width = 1600, height = 800, bg = 'black')
 canvas.pack()
@@ -171,27 +172,46 @@ canvas.bind_all('<KeyRelease>', end_input)
 def start_game():
     end_title()
     window.after(1000, make_circle)
-    #window.after(1750, del_circle)
     window.after(1000, check_hits)
+
+max_score = 0
+def write_record():
+    global max_score,score
+    file = open("OsuRank.txt", "a")
+    file.write(str(score) + "\n")
+    file = open("OsuRank.txt", "r")
+    if file.mode == 'r':
+        contents = file.read()
+        score_list = contents.split("\n")
+        for i in score_list:
+            if i == '':
+                continue
+            elif int(i) > max_score:
+                max_score = int(i)
+    file.close()
 
 
 
 def game_over():
-    global endgame, game_over_note, percent_note, key_note
+    global endgame, game_over_note, percent_note, key_note, highest_record
     endgame = True
     correct_pecentage = (correct_circle / total_circle * 100)
-    game_over_note = canvas.create_text(800, 400, text = 'Game Over', fill = 'red', font = ('Helvetica', 50))
-    percent_note = canvas.create_text(800, 500, text = 'Correct pecentage : ' + str(round(correct_pecentage,2)) + ' %', fill = 'white', font = ('Helvetica', 20))
-    key_note = canvas.create_text(800, 600, text = 'Press "Esc" to exit, "r" to restart', fill = 'white', font = ('Helvetica', 20))
+    write_record()
+    game_over_note = canvas.create_text(750, 300, text = 'Game Over', fill = 'red', font = ('Helvetica', 50))
+    percent_note = canvas.create_text(750, 400, text = 'Correct pecentage : ' + str(round(correct_pecentage,2)) + ' %', fill = 'white', font = ('Helvetica', 20))
+    highest_record = canvas.create_text(750, 500, text = 'Highest score : ' + str(max_score), fill = 'white', font = ('Helvetica', 20))
+    key_note = canvas.create_text(750, 600, text = 'Press "Esc" to exit, "Enter" to restart', fill = 'white', font = ('Helvetica', 20))
     canvas.bind_all('<KeyPress>', restart)
 
+
 def restart(event):
-    global title, direction, correct_circle, total_circle, score, score_display, combo, hp, hp_title, hp_display, endgame, combo_display, circle_list, game_over_note, percent_note, key_note
-    if event.keysym == 'r':
+    global title, direction, correct_circle, total_circle, score, score_display, combo, hp, hp_title, hp_display, endgame, combo_display, circle_list
+    if event.keysym == 'Return':
         canvas.delete(game_over_note)
         canvas.delete(percent_note)
         canvas.delete(key_note)
         canvas.delete(score_display)
+        canvas.delete(highest_record)
 
         title = canvas.create_text(800, 400, text = 'Osu!', fill = 'white', font = ('Helvetica', 50))
         direction = canvas.create_text(800, 500, text = 'Press Enter to start', fill = 'white', font = ('Helvetica', 20))
