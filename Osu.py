@@ -1,5 +1,6 @@
-#Todo: combo bonus, various map, highest score, personal record
+#Todo: combo bonus, various map, highest combo, grade review(ABCD)
 
+from os import remove
 from tkinter import *
 import random
 
@@ -13,12 +14,43 @@ canvas = Canvas(window, width = 1600, height = 800, bg = 'black')
 canvas.pack()
 
 #title
-title = canvas.create_text(800, 400, text = 'Osu!', fill = 'white', font = ('Helvetica', 50))
-direction = canvas.create_text(800, 500, text = 'Press Enter to start', fill = 'white', font = ('Helvetica', 20))
+title = canvas.create_text(750, 400, text = 'Osu!', fill = 'white', font = ('Helvetica', 50))
+direction = canvas.create_text(750, 500, text = 'Press Enter to start, Esc to exit', fill = 'white', font = ('Helvetica', 20))
 
+# personal record
+def sort_rank():
+    global score_list
+    file = open("OsuRank.txt", "a")
+    file = open("OsuRank.txt", "r")
+    if file.mode == 'r':
+        contents = file.read()
+        score_list = contents.split("\n")
+        for i in score_list:
+            if i == '':
+                score_list.remove(i)
+        score_list = list(map(int, score_list))
+        score_list.sort(reverse = True)
+
+rank_display = ''
+def rank_list():
+    global rank_display, score_list
+    count = 1
+    for i in score_list[:10]:
+        if i == '':
+            continue
+        else:
+            rank_display += (str(count) + ".  " + str(i) + "\n")
+            count += 1
+
+sort_rank()
+rank_list()
+record = canvas.create_text(150, 400, text = 'Personal Record : \n\n' + rank_display , fill = 'white', font = ('Helvetica', 20))
+
+#delete start UI
 def end_title():
     canvas.delete(title)
     canvas.delete(direction)
+    canvas.delete(record)
 
 correct_circle = 0
 total_circle = 0
@@ -42,7 +74,6 @@ def update_hp():
 image = PhotoImage(file = 'ball.gif')
 ball = canvas.create_image(400, 400, anchor=NW, image=image)
 
-
 def move(e):
    global image,ball
    image = PhotoImage(file = 'ball.gif')
@@ -50,10 +81,8 @@ def move(e):
 
 canvas.bind("<Motion>", move)
 
-
 #Create circle
 endgame = False
-
 
 circle_list = []
 def make_circle():
@@ -86,7 +115,6 @@ def del_circle():
             canvas.delete(circle)
             circle_list.remove(circle)
             break
-        #window.after(750, del_circle)
 
 
 # read input
@@ -163,8 +191,6 @@ def check_hits():
     correct == False
     window.after(100, check_hits)
     
-
-
 canvas.bind_all('<KeyPress>', check_input)
 canvas.bind_all('<KeyRelease>', end_input)
 
@@ -174,6 +200,7 @@ def start_game():
     window.after(1000, make_circle)
     window.after(1000, check_hits)
 
+# record score
 max_score = 0
 def write_record():
     global max_score,score
@@ -205,7 +232,7 @@ def game_over():
 
 
 def restart(event):
-    global title, direction, correct_circle, total_circle, score, score_display, combo, hp, hp_title, hp_display, endgame, combo_display, circle_list
+    global title, direction, correct_circle, total_circle, score, score_display, combo, hp, hp_title, hp_display, endgame, combo_display, circle_list, record, rank_display
     if event.keysym == 'Return':
         canvas.delete(game_over_note)
         canvas.delete(percent_note)
@@ -215,7 +242,10 @@ def restart(event):
 
         title = canvas.create_text(800, 400, text = 'Osu!', fill = 'white', font = ('Helvetica', 50))
         direction = canvas.create_text(800, 500, text = 'Press Enter to start', fill = 'white', font = ('Helvetica', 20))
-
+        rank_display = ''
+        sort_rank()
+        rank_list()
+        record = canvas.create_text(150, 400, text = 'Personal Record : \n\n' + rank_display , fill = 'white', font = ('Helvetica', 20))
         correct_circle = 0
         total_circle = 0
         score = 0

@@ -4,7 +4,7 @@ score = random.randint(0, 100)
 
 max_score = 0
 def write_record():
-    global max_score,score
+    global max_score,score,score_list
     file = open("test.txt", "a")
     file.write(str(score) + "\n")
     file = open("test.txt", "r")
@@ -14,9 +14,21 @@ def write_record():
         for i in score_list:
             if i == '':
                 continue
-            elif int(i) > max_score:
-                max_score = int(i)
+            else:
+                int(i)
+                score_list.sort(reverse = True)
     file.close()
 
+def rank():
+    count = 1
+    for i in score_list:
+        if i == '':
+            continue
+        else:
+            print(str(count) + ".  " + str(i))
+            count += 1
+
+
 write_record()
-print(max_score)
+print(score_list)
+rank()  
