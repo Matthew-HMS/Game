@@ -4,7 +4,7 @@ from os import remove
 from tkinter import *
 import random
 
-#Enter game UI
+#Enter game UI test
 
 window = Tk()
 window.title("Osu!")
